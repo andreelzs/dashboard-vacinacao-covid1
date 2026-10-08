@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Análise da relação entre vacinação contra COVID-19 e internações em 8 municípios do Sudeste, de 2021 a 2024.">
+  <title>Vacinação COVID-19 e Internações | Projeto G1</title>
+  <style>
+    :root {
+      --roxo: #4c2a85;
+      --roxo-escuro: #2e1a56;
+      --lilas: #efeaf8;
+      --verde: #1f9d7a;
+      --texto: #25213a;
+      --suave: #675f80;
+      --fundo: #f7f5fb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--fundo); color: var(--texto);
+           font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif; line-height: 1.6; }
+    a { color: var(--roxo); }
+    .wrap { max-width: 960px; margin: 0 auto; padding-inline: 18px; }
+
+    /* topo */
+    header { background: linear-gradient(160deg, var(--roxo-escuro), var(--roxo)); color: #fff; padding: 52px 0 96px; }
+    .selo { display: inline-block; font-size: 0.82rem; background: rgba(255,255,255,0.14); border-radius: 999px; padding: 4px 14px; margin-bottom: 16px; }
+    h1 { margin: 0 0 12px; font-size: clamp(1.9rem, 5vw, 2.9rem); line-height: 1.12; }
+    h1 em { font-style: normal; color: #8fe3c8; }
+    header p { margin: 0 0 8px; max-width: 58ch; color: #e0d8f2; }
+    header .autor { font-size: 0.92rem; margin-bottom: 26px; color: #cbbfe6; }
+    .botoes { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn { display: inline-block; text-decoration: none; font-weight: 700; padding: 12px 22px; border-radius: 10px; font-size: 0.95rem; }
+    .btn.verde { background: var(--verde); color: #fff; }
+    .btn.verde:hover { background: #17805f; }
+    .btn.vazado { border: 2px solid rgba(255,255,255,0.55); color: #fff; }
+    .btn.vazado:hover { background: rgba(255,255,255,0.14); }
+
+    /* numeros sobrepostos ao topo */
+    .numeros { margin-top: -56px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .numero { background: #fff; border-radius: 14px; padding: 18px 16px; box-shadow: 0 6px 20px rgba(46, 26, 86, 0.12); text-align: center; }
+    .numero strong { display: block; font-size: 1.9rem; color: var(--roxo); line-height: 1.1; }
+    .numero span { font-size: 0.82rem; color: var(--suave); display: block; margin-top: 6px; line-height: 1.35; }
+
+    /* blocos */
+    main { padding: 34px 0 10px; }
+    .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .bloco { background: #fff; border-radius: 14px; padding: 22px 24px; border-top: 5px solid var(--roxo); }
+    .bloco.verde { border-top-color: var(--verde); }
+    .bloco h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--roxo-escuro); }
+    .bloco p { margin: 0 0 8px; }
+    .bloco ul { margin: 0; padding-left: 20px; }
+    .bloco li { margin-bottom: 6px; }
+    .largo { grid-column: 1 / -1; }
+    .passos { counter-reset: p; list-style: none; padding: 0 !important; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .passos li { counter-increment: p; background: var(--lilas); border-radius: 10px; padding: 12px 14px; margin: 0; font-size: 0.93rem; }
+    .passos li::before { content: counter(p); display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center;
+                         background: var(--roxo); color: #fff; border-radius: 50%; font-size: 0.8rem; margin-right: 8px; font-weight: 700; }
+    .pilulas { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .pilulas span { background: var(--lilas); color: var(--roxo-escuro); border-radius: 8px; padding: 4px 12px; font-size: 0.88rem; font-weight: 700; }
+    .conclusao { background: var(--roxo-escuro); color: #ece6fa; border: 0; }
+    .conclusao h2 { color: #8fe3c8; }
+
+    /* dashboard */
+    .painel { background: linear-gradient(120deg, var(--verde), #167a5e); color: #fff; border-radius: 14px; padding: 28px 28px; margin-bottom: 18px;
+              display: flex; flex-wrap: wrap; gap: 16px 30px; align-items: center; justify-content: space-between; }
+    .painel h2 { margin: 0 0 4px; font-size: 1.4rem; }
+    .painel p { margin: 0; max-width: 50ch; color: #dcf6ee; }
+    .painel small { display: block; margin-top: 6px; color: #bfeadb; font-size: 0.8rem; }
+    .painel .btn { background: #fff; color: #167a5e; padding: 14px 28px; }
+    .painel .btn:hover { background: #eafaf4; }
+
+    footer { text-align: center; font-size: 0.85rem; color: var(--suave); padding: 22px 18px 40px; }
+
+    @media (max-width: 760px) {
+      .numeros { grid-template-columns: 1fr; }
+      .grade { grid-template-columns: 1fr; }
+      .passos { grid-template-columns: 1fr; }
+      header { padding-bottom: 84px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="wrap">
+      <span class="selo">Linguagens de Programação · Projeto G1</span>
+      <h1>Vacinação contra a COVID-19 e as <em>internações</em></h1>
+      <p>Quem vacinou mais, internou menos?</p>
+      <p class="autor">André Luiz dos Santos Ferreira · Prof. Alexandre Louzada</p>
+      <div class="botoes">
+        <a class="btn verde" data-link="dashboard" target="_blank" rel="noopener">Acessar o dashboard</a>
+        <a class="btn vazado" data-link="repo" target="_blank" rel="noopener">Repositório no GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="numeros" aria-label="Resultados em números">
+      <div class="numero"><strong>−0,36</strong><span>correlação entre cobertura e internações</span></div>
+      <div class="numero"><strong>−30%</strong><span>internações em 2022 frente a 2021</span></div>
+      <div class="numero"><strong>8</strong><span>municípios, de 2021 a 2024</span></div>
+    </section>
+
+    <main>
+      <section class="bloco largo" style="margin-bottom:18px">
+        <h2>Sobre o projeto</h2>
+        <p>Análise de uma base simulada para ver se os municípios com mais vacinação tiveram menos internações por COVID-19. O resultado é uma tendência moderada, que não prova causa e efeito.</p>
+        <div class="pilulas">
+          <span>Python</span><span>Pandas</span><span>NumPy</span><span>Matplotlib</span><span>Seaborn</span><span>Plotly</span><span>Streamlit</span><span>GitHub Pages</span>
+        </div>
+      </section>
+
+      <section class="bloco largo">
+        <h2>Arquivos</h2>
+        <ul>
+          <li><a data-link="readme" target="_blank" rel="noopener">README</a></li>
+          <li><a data-link="notebook" target="_blank" rel="noopener">Notebook da análise</a></li>
+          <li><a data-link="repo" target="_blank" rel="noopener">Repositório no GitHub</a></li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    André Luiz dos Santos Ferreira · Linguagens de Programação · Prof. Alexandre Louzada<br>
+    Base simulada do repositório do professor.
+  </footer>
+
+  <script>
+    const USUARIO = "andreelzs";
+    const REPOSITORIO = "dashboard-vacinacao-covid";
+    const STREAMLIT_URL = "https://dashboard-vacinacao-covid-c9ybbpfzpkit9xmwk5xqqi.streamlit.app/";
+
+    const repo = "https://github.com/" + USUARIO + "/" + REPOSITORIO;
+    const links = {
+      dashboard: STREAMLIT_URL,
+      repo: repo,
+      readme: repo + "/blob/main/README.md",
+      notebook: repo + "/blob/main/notebooks/analise_vacinacao_covid.ipynb"
+    };
+    document.querySelectorAll("[data-link]").forEach(function (a) {
+      a.href = links[a.dataset.link];
+    });
+  </script>
+</body>
+</html>
